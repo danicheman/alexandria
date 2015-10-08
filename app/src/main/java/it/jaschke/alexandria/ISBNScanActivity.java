@@ -1,8 +1,12 @@
 package it.jaschke.alexandria;
 
-import android.app.Activity;
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,52 +17,58 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 /**
  * Created by NICK on 9/27/2015.
+ *
+ * On a phone layout, launch the scan fragment
  */
-public class ISBNScanActivity extends Activity implements ZBarScannerView.ResultHandler {
-    private static final String TAG = "CAMERA_SCAN_ACTIVITY";
-    private static final String FLASH_STATE = "FLASH_STATE";
-    private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
-    private static final String SELECTED_FORMATS = "SELECTED_FORMATS";
-    private static final String CAMERA_ID = "CAMERA_ID";
+public class IsbnScanActivity extends ActionBarActivity implements IsbnScanFragment.Callback {
+    //todo: move to fragment
 
-    private ZBarScannerView mScannerView;
+    private String scannedIsbn = "-1";
 
     //empty constructor necessary to launch this activity.
-    public ISBNScanActivity() {  }
-
-    @Override
-    public void onCreate(Bundle state) {
-        super.onCreate(state);
-        mScannerView = new ZBarScannerView(this);    // Programmatically initialize the scanner view
-
-        //just add the isbn13 format
-        List<BarcodeFormat> formats = new ArrayList<>();
-        formats.add(BarcodeFormat.ISBN13);
-        mScannerView.setFormats(formats);
-
-        setContentView(mScannerView);                // Set the scanner view as the content view
-
+    public IsbnScanActivity() {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
-        mScannerView.startCamera();          // Start camera on resume
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_simple_scanner_fragment);
+
+        /*if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new IsbnScanFragment())
+                    .commit();
+        }*/
+    }
+
+    /**
+     * When you press back button on the action bar in the details activity,
+     * you’ll see the state of the main activity is lost (if you had scrolled
+     * in the list somewhere it just reloads). Here’s a neat trick to prevent
+     * that from happening:
+     */
+    @Override
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public Intent getParentActivityIntent() {
+        // add the clear top flag - which checks if the parent (main)
+        // activity is already running and avoids recreating it
+        return super.getParentActivityIntent()
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        mScannerView.stopCamera();           // Stop camera on pause
+    public void recieveIsbn(String isbn) {
+        this.scannedIsbn = isbn;
     }
 
-
-
+    /**
+     * set an activity result that tells the previous activity what barcode was scanned
+     */
     @Override
-    public void handleResult(Result rawResult) {
-        // Do something with the result here
-        Log.v(TAG, rawResult.getContents()); // Prints scan results
-        Log.v(TAG, rawResult.getBarcodeFormat().getName()); // Prints the scan format (qrcode, pdf417 etc.)
+    public void onBackPressed() {
+        Intent output = new Intent();
+        output.putExtra(AddBook.ISBN_RESULT, scannedIsbn);
+        setResult(0, output);
+        super.onBackPressed();
     }
 }

@@ -2,6 +2,7 @@ package it.jaschke.alexandria;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -26,6 +27,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     private ListView bookList;
     private int position = ListView.INVALID_POSITION;
     private EditText searchText;
+    private Cursor mBookCursor;
 
     private final int LOADER_ID = 10;
 
@@ -40,16 +42,11 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        Cursor cursor = getActivity().getContentResolver().query(
-                AlexandriaContract.BookEntry.CONTENT_URI,
-                null, // leaving "columns" null just returns all the columns.
-                null, // cols for "where" clause
-                null, // values for "where" clause
-                null  // sort order
-        );
+        FetchBooksTask fbt = new FetchBooksTask();
+        fbt.execute();
 
 
-        bookListAdapter = new BookListAdapter(getActivity(), cursor, 0);
+        bookListAdapter = new BookListAdapter(getActivity(), mBookCursor, 0);
         View rootView = inflater.inflate(R.layout.fragment_list_of_books, container, false);
         searchText = (EditText) rootView.findViewById(R.id.searchText);
         rootView.findViewById(R.id.searchButton).setOnClickListener(
@@ -87,7 +84,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         final String selection = AlexandriaContract.BookEntry.TITLE +" LIKE ? OR " + AlexandriaContract.BookEntry.SUBTITLE + " LIKE ? ";
-        String searchString =searchText.getText().toString();
+        String searchString = searchText.getText().toString();
 
         if(searchString.length()>0){
             searchString = "%"+searchString+"%";
@@ -128,5 +125,21 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         activity.setTitle(R.string.books);
+    }
+
+    public class FetchBooksTask extends AsyncTask<Void, Void, Void> {
+
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mBookCursor = getActivity().getContentResolver().query(
+                    AlexandriaContract.BookEntry.CONTENT_URI,
+                    null, // leaving "columns" null just returns all the columns.
+                    null, // cols for "where" clause
+                    null, // values for "where" clause
+                    null  // sort order
+            );
+            return null;
+        }
     }
 }

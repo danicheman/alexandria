@@ -22,11 +22,11 @@ android {
     }
     buildTypes {
         release {
-            testCoverageEnabled = true
+            testCoverageEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug{
-            testCoverageEnabled = true
+            testCoverageEnabled = false
         }
 
     }
