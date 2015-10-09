@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,13 +26,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 
 import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.data.NetworkUtil;
 import it.jaschke.alexandria.services.BookService;
 import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, CameraSelectorDialogFragment.CameraSelectorDialogListener,ZBarScannerView.ResultHandler {
-    private static final String TAG = "INTENT_TO_SCAN_ACTIVITY";
+    private static final String TAG = AddBook.class.getSimpleName();
     private EditText ean;
     private final int LOADER_ID = 1;
     private View rootView;
@@ -159,7 +162,23 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
+            if (!NetworkUtil.isNetworkAvailable(getActivity())) {
+                Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
+                messageIntent.putExtra(MainActivity.MESSAGE_KEY,"Unable to fetch data, you are not connected to the internet.");
+                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(messageIntent);
+                Log.e(TAG, "No internet connection. Load finished with No results.");
+            } else {
+                Log.e(TAG, "Network IS connected. Load finished with No results.");
+            }
             return;
+        } else {
+            //hide keyboard
+            // Check if no view has focus:
+            View view = getActivity().getCurrentFocus();
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+            }
         }
 
         String bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
@@ -173,6 +192,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
         if(authors == null) authorsArr = new String[] {"No Authors Found"};
         else authorsArr = authors.split(",");
+        Log.e(TAG, authors);
 
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));

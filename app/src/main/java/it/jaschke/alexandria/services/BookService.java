@@ -129,7 +129,8 @@ public class BookService extends IntentService {
             }
             bookJsonString = buffer.toString();
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Error ", e);
+            //UnknownHostException if network is down.
+            Log.e(LOG_TAG, "Error reader" + bookJsonString+ e.getClass());
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -141,7 +142,6 @@ public class BookService extends IntentService {
                     Log.e(LOG_TAG, "Error closing stream", e);
                 }
             }
-
         }
 
         final String ITEMS = "items";
@@ -157,6 +157,11 @@ public class BookService extends IntentService {
         final String IMG_URL = "thumbnail";
 
         try {
+            //network was down?
+            if(bookJsonString == null) {
+                return;
+            }
+
             JSONObject bookJson = new JSONObject(bookJsonString);
             JSONArray bookArray;
             if(bookJson.has(ITEMS)){
@@ -197,7 +202,11 @@ public class BookService extends IntentService {
             }
 
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Error ", e);
+            Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
+            messageIntent.putExtra(MainActivity.MESSAGE_KEY,"Unexpected, unusable result from search");
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
+            Log.e(LOG_TAG, "Error, here's the web result: " + bookJsonString, e);
+            return;
         }
     }
 

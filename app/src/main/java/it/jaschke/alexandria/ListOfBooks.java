@@ -18,6 +18,7 @@ import android.widget.ListView;
 import it.jaschke.alexandria.api.BookListAdapter;
 import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.data.NetworkUtil;
 
 
 public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -115,9 +116,16 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         if(data.moveToFirst() != false) {
+
             Log.e(LOG_TAG, "Load finished with one or more results.");
         } else {
-            Log.e(LOG_TAG, "Load finished with NO results.");
+            //check network connectivity
+            if (!NetworkUtil.isNetworkAvailable(getActivity())) {
+                Log.e(LOG_TAG, "No internet connection. Load finished with No results.");
+            } else {
+                Log.e(LOG_TAG, "Load finished with NO results.");
+            }
+
         }
 
         bookListAdapter.swapCursor(data);
