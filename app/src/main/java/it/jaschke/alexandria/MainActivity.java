@@ -60,6 +60,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                     (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
+
     @Override
     public void onNavigationDrawerItemSelected(int position) {
 
@@ -170,13 +171,14 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
+    /* Rule: don't override the basic functionality of the back button.
     @Override
     public void onBackPressed() {
         if(getSupportFragmentManager().getBackStackEntryCount()<2){
             finish();
         }
         super.onBackPressed();
-    }
+    }*/
 
 
 }
