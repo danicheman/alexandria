@@ -173,6 +173,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) {
+            //do nothing found toast
+            ((TextView) rootView.findViewById(R.id.bookTitle)).setText("No Book Found.");
             return;
         }
 
