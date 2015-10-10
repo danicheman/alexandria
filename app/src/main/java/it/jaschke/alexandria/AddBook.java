@@ -32,21 +32,15 @@ import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 
-public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, CameraSelectorDialogFragment.CameraSelectorDialogListener,ZBarScannerView.ResultHandler {
+public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = AddBook.class.getSimpleName();
     private EditText ean;
     private final int LOADER_ID = 1;
+    private static final int ISBN_SCAN_ACTIVITY = 1;
     private View rootView;
     private final String EAN_CONTENT="eanContent";
-    private static final String SCAN_FORMAT = "scanFormat";
-    private static final String SCAN_CONTENTS = "scanContents";
 
-    private String mScanFormat = "Format:";
-    private String mScanContents = "Contents:";
-    private ZBarScannerView mScannerView;
-    private int mCameraId = -1;
-    private boolean mFlash = false;
-    private boolean mAutoFocus = true;
+    public static final String ISBN_RESULT = "isbnResult";
 
     public AddBook(){
     }
@@ -56,6 +50,21 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         super.onSaveInstanceState(outState);
         if(ean!=null) {
             outState.putString(EAN_CONTENT, ean.getText().toString());
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (data == null) {
+            Log.e(TAG, "didn't recieve valid result from scan activity.");
+        } else {
+            Log.d(TAG, "got a scan result, launch a search" + resultCode);
+            //todo: Display the found ean/isbn
+            ean.setText(data.getStringExtra(ISBN_RESULT));
+
+            //this.restartLoader();
         }
     }
 
@@ -170,6 +179,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             } else {
                 Log.e(TAG, "Network IS connected. Load finished with No results.");
             }
+            //do nothing found toast
+            ((TextView) rootView.findViewById(R.id.bookTitle)).setText("No Book Found.");
             return;
         } else {
             //hide keyboard
@@ -190,7 +201,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         String[] authorsArr;
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
 
-        if(authors == null) authorsArr = new String[] {"No Authors Found"};
+        if (authors == null) {
+            authors = "No Authors Found";
+            authorsArr = new String[]{authors};
+        }
         else authorsArr = authors.split(",");
         Log.e(TAG, authors);
 
@@ -234,16 +248,4 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         activity.setTitle(R.string.scan);
     }
 
-    @Override
-    public void handleResult(Result result) {
-        Log.e(TAG, "Result from camera?"+result.getContents());
-    }
-
-    @Override
-    public void onCameraSelected(int cameraId) {
-        mCameraId = cameraId;
-        mScannerView.startCamera(mCameraId);
-        mScannerView.setFlash(mFlash);
-        mScannerView.setAutoFocus(mAutoFocus);
-    }
 }
