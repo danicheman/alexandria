@@ -34,7 +34,7 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".IsbnScanActivity"
+            android:name=".ISBNScanActivity"
 
             android:label="@string/isbn_scan_activity"><!--removed: android:theme="@style/AppOverlayTheme" -->
         </activity>
