@@ -34,8 +34,8 @@ public class IsbnScanActivity extends ActionBarActivity implements IsbnScanFragm
 
     /**
      * When you press back button on the action bar in the details activity,
-     * you’ll see the state of the main activity is lost (if you had scrolled
-     * in the list somewhere it just reloads). Here’s a neat trick to prevent
+     * youâ€™ll see the state of the main activity is lost (if you had scrolled
+     * in the list somewhere it just reloads). Hereâ€™s a neat trick to prevent
      * that from happening:
      */
     @Override
