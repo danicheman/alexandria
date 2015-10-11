@@ -142,6 +142,9 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         activity.setTitle(R.string.books);
     }
 
+    /**
+     * Fetch all the books that have been saved already.
+     */
     public class FetchBooksTask extends AsyncTask<Void, Void, Void> {
 
 
@@ -154,6 +157,8 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     null, // values for "where" clause
                     null  // sort order
             );
+            bookListAdapter.swapCursor(mBookCursor);
+            Log.e(LOG_TAG, "FetchbooksTask" + mBookCursor.getCount());
             return null;
         }
     }

@@ -5,25 +5,16 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-
-
-import java.util.ArrayList;
-import java.util.List;
-
-import me.dm7.barcodescanner.zbar.BarcodeFormat;
-import me.dm7.barcodescanner.zbar.Result;
-import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 /**
  * Created by NICK on 9/27/2015.
- *
+ * <p/>
  * On a phone layout, launch the scan fragment
  */
 public class IsbnScanActivity extends ActionBarActivity implements IsbnScanFragment.Callback {
-    //todo: move to fragment
 
     private String scannedIsbn = "-1";
+    private static final String TAG = IsbnScanActivity.class.getSimpleName();
 
     //empty constructor necessary to launch this activity.
     public IsbnScanActivity() {
@@ -56,9 +47,13 @@ public class IsbnScanActivity extends ActionBarActivity implements IsbnScanFragm
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
+    //return isbn to addBook screen
     @Override
     public void recieveIsbn(String isbn) {
-        this.scannedIsbn = isbn;
+        Intent output = new Intent();
+        output.putExtra(AddBook.ISBN_RESULT, isbn);
+        setResult(0, output);
+        finish();
     }
 
     /**

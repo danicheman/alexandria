@@ -217,7 +217,8 @@ public class BookService extends IntentService {
         values.put(AlexandriaContract.BookEntry.IMAGE_URL, imgUrl);
         values.put(AlexandriaContract.BookEntry.SUBTITLE, subtitle);
         values.put(AlexandriaContract.BookEntry.DESC, desc);
-        getContentResolver().insert(AlexandriaContract.BookEntry.CONTENT_URI,values);
+        getContentResolver().insert(AlexandriaContract.BookEntry.CONTENT_URI, values);
+        Log.e(LOG_TAG, "saved book");
     }
 
     private void writeBackAuthors(String ean, JSONArray jsonArray) throws JSONException {
@@ -228,6 +229,7 @@ public class BookService extends IntentService {
             getContentResolver().insert(AlexandriaContract.AuthorEntry.CONTENT_URI, values);
             values= new ContentValues();
         }
+        Log.e(LOG_TAG, "saved authors");
     }
 
     private void writeBackCategories(String ean, JSONArray jsonArray) throws JSONException {
@@ -238,5 +240,6 @@ public class BookService extends IntentService {
             getContentResolver().insert(AlexandriaContract.CategoryEntry.CONTENT_URI, values);
             values= new ContentValues();
         }
+        Log.e(LOG_TAG, "saved categories");
     }
  }

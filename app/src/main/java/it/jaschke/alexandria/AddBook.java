@@ -20,7 +20,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
@@ -28,8 +27,6 @@ import com.bumptech.glide.Glide;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.data.NetworkUtil;
 import it.jaschke.alexandria.services.BookService;
-import me.dm7.barcodescanner.zbar.Result;
-import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 
 public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -57,14 +54,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (data == null) {
-            Log.e(TAG, "didn't recieve valid result from scan activity.");
-        } else {
-            Log.d(TAG, "got a scan result, launch a search" + resultCode);
-            //todo: Display the found ean/isbn
+        if (data != null && data.getStringExtra(ISBN_RESULT) != "-1") {
             ean.setText(data.getStringExtra(ISBN_RESULT));
-
-            //this.restartLoader();
         }
     }
 
@@ -114,8 +105,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
                 // are using an external app.
 
-                Intent scanIntent = new Intent(getActivity(), ISBNScanActivity.class);
-                startActivity(scanIntent);
+                Intent scanIntent = new Intent(getActivity(), IsbnScanActivity.class);
+                startActivityForResult(scanIntent, ISBN_SCAN_ACTIVITY);
             }
         });
 

@@ -1,5 +1,6 @@
 package it.jaschke.alexandria;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,30 +35,35 @@ public class IsbnScanFragment extends Fragment implements ZBarScannerView.Result
     private int mCameraId = -1;
     private boolean mFlash = false;
     private boolean mAutoFocus = true;
+    private Callback mCallback;
 
     @Override
     public void handleResult(Result result) {
         Log.i(TAG, "raw result was #" + result.getContents() + "#");
-        //int scanResult = Integer.parseInt(result.getContents());
-        //Toast.makeText(getActivity(), "Contents = " + result.getContents(), Toast.LENGTH_SHORT).show();
-        //if(scanResult == 0) {
-
-        //    mScannerView.startCamera();
-        //} else {
-        //set the value of the isbn scanned back in the activity.
-        //    ((Callback) getActivity()).recieveIsbn(result.getContents());
-        //trigger "back" button functionality
 
         //return the isbn as a string in a result bundle
-        Intent output = new Intent();
-        output.putExtra(AddBook.ISBN_RESULT, result.getContents());
-        getActivity().setResult(0, output);
-        getActivity().finish();
-        //}
+        //Intent output = new Intent();
+        //output.putExtra(AddBook.ISBN_RESULT, result.getContents());
+        Log.i(TAG, getActivity().getLocalClassName());
+        //getActivity().setResult(0, output);
+        //getActivity().finish();
+        mCallback.recieveIsbn(result.getContents());
     }
 
     public interface Callback {
         void recieveIsbn(String isbn);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            mCallback = (Callback) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement IsbnScanFragment.Callback");
+        }
     }
 
     @Override
