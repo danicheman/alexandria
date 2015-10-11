@@ -11,13 +11,13 @@ import android.support.v7.app.ActionBarActivity;
  * <p/>
  * On a phone layout, launch the scan fragment
  */
-public class IsbnScanActivity extends ActionBarActivity implements IsbnScanFragment.Callback {
+public class ISBNScanActivity extends ActionBarActivity implements IsbnScanFragment.Callback {
 
     private String scannedIsbn = "-1";
-    private static final String TAG = IsbnScanActivity.class.getSimpleName();
+    private static final String TAG = ISBNScanActivity.class.getSimpleName();
 
     //empty constructor necessary to launch this activity.
-    public IsbnScanActivity() {
+    public ISBNScanActivity() {
     }
 
     @Override
