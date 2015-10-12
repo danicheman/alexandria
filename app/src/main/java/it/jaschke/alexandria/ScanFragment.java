@@ -2,13 +2,11 @@ package it.jaschke.alexandria;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +18,9 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
 /**
  * Created by NICK on 9/29/2015.
  */
-public class IsbnScanFragment extends Fragment implements ZBarScannerView.ResultHandler {
+public class ScanFragment extends Fragment implements ZBarScannerView.ResultHandler {
 
-    private static final String TAG = IsbnScanFragment.class.getSimpleName();
+    private static final String TAG = ScanFragment.class.getSimpleName();
     private static final String FLASH_STATE = "FLASH_STATE";
     private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
     private static final String SELECTED_FORMATS = "SELECTED_FORMATS";
@@ -62,7 +60,7 @@ public class IsbnScanFragment extends Fragment implements ZBarScannerView.Result
             mCallback = (Callback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement IsbnScanFragment.Callback");
+                    + " must implement ScanFragment.Callback");
         }
     }
 

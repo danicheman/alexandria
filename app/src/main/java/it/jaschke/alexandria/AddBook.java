@@ -105,7 +105,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 // Hint: Use a Try/Catch block to handle the Intent dispatch gracefully, if you
                 // are using an external app.
 
-                Intent scanIntent = new Intent(getActivity(), ISBNScanActivity.class);
+                Intent scanIntent = new Intent(getActivity(), ScanActivity.class);
                 startActivityForResult(scanIntent, ISBN_SCAN_ACTIVITY);
             }
         });

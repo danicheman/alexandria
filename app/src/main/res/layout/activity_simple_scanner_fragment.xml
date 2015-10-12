@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <fragment
-        android:name="it.jaschke.alexandria.IsbnScanFragment"
+        android:name="it.jaschke.alexandria.ScanFragment"
         android:id="@+id/scanner_fragment"
         android:layout_weight="1"
         android:layout_width="match_parent"
