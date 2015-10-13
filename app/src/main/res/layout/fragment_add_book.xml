@@ -78,7 +78,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/bookCover"
             android:contentDescription="@string/book_cover"
-            android:layout_alignTop="@+id/authors"
+            android:layout_margin="20dp"
+            android:layout_below="@+id/authors"
             android:layout_alignLeft="@+id/eancontainer"
             android:layout_alignStart="@+id/eancontainer"/>
 

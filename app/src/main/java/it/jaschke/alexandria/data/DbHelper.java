@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class DbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "alexandria.db";
 
     public DbHelper(Context context) {
@@ -37,7 +37,7 @@ public class DbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE " + AlexandriaContract.CategoryEntry.TABLE_NAME + " ("+
                 AlexandriaContract.CategoryEntry._ID + " INTEGER," +
                 AlexandriaContract.CategoryEntry.CATEGORY + " TEXT," +
-                "UNIQUE (" + AlexandriaContract.CategoryEntry._ID + ", " + AlexandriaContract.CategoryEntry.CATEGORY + ")" +
+                "UNIQUE (" + AlexandriaContract.CategoryEntry._ID + ", " + AlexandriaContract.CategoryEntry.CATEGORY + ") ON CONFLICT IGNORE" +
                 " FOREIGN KEY (" + AlexandriaContract.CategoryEntry._ID + ") REFERENCES " +
                 AlexandriaContract.BookEntry.TABLE_NAME + " (" + AlexandriaContract.BookEntry._ID + "))";
 

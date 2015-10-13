@@ -68,7 +68,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Cursor cursor = bookListAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    ((Callback)getActivity())
+                    ((Callback) getActivity())
                             .onItemSelected(cursor.getString(cursor.getColumnIndex(AlexandriaContract.BookEntry._ID)));
                 }
             }
@@ -157,9 +157,22 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     null, // values for "where" clause
                     null  // sort order
             );
-            bookListAdapter.swapCursor(mBookCursor);
-            Log.e(LOG_TAG, "FetchbooksTask" + mBookCursor.getCount());
+
+
+            Log.e(LOG_TAG, "FetchbooksTask all book fetch result:" + mBookCursor.getCount());
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            bookListAdapter.swapCursor(mBookCursor);
+
+            if (mBookCursor.getCount() == 0) {
+                bookList.setEmptyView(getActivity().findViewById(R.id.noBooks));
+            }
+
+            super.onPostExecute(aVoid);
         }
     }
 }
