@@ -103,11 +103,13 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     return;
                 }
                 //Once we have an ISBN, start a book intent
-                Intent bookIntent = new Intent(getActivity(), BookService.class);
+                /*Intent bookIntent = new Intent(getActivity(), BookService.class);
                 bookIntent.putExtra(BookService.EAN, ean);
                 bookIntent.setAction(BookService.FETCH_BOOK);
-                getActivity().startService(bookIntent);
-                AddBook.this.restartLoader();
+                getActivity().startService(bookIntent);*/
+                GetIsbnResultTask getIsbnResultTask = new GetIsbnResultTask();
+                getIsbnResultTask.execute(ean);
+                //AddBook.this.restartLoader();
             }
         });
 
@@ -256,13 +258,15 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         activity.setTitle(R.string.scan);
     }
 
+    //todo: add loading animation here in pre-execute, hide in post execute.  Handle error conditions better
     private class GetIsbnResultTask extends AsyncTask<String, Void, Void> {
 
-        private final String LOG_TAG = AddBook.class.getSimpleName();
+        private final String LOG_TAG = GetIsbnResultTask.class.getSimpleName();
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            Log.d(LOG_TAG, "on post execute");
             //now search the database for the provided isbn
             restartLoader();
         }

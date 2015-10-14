@@ -21,7 +21,7 @@ import it.jaschke.alexandria.api.Callback;
 import it.jaschke.alexandria.data.AlexandriaContract;
 import it.jaschke.alexandria.data.NetworkUtil;
 
-
+//todo: get rid of bookservice - move logic into async task here.
 public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private final String LOG_TAG = ListOfBooks.class.getSimpleName();
     private BookListAdapter bookListAdapter;
