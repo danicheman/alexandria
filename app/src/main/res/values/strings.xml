@@ -26,7 +26,9 @@
     <string name="share_text">A must read book: </string>
     <string name="select_camera">Select a Camera</string>
     <string name="isbn_scan_activity">Take a picture of an isbn</string>
-<!-- TODO: Remove or change this placeholder text -->
+
     <string name="about_text">This application gets book information from a Google API. All titles, cover images, and author information come from there.
-    The original version of this app was built by Sascha Jaschke, and a modified version is given to students in the Udacity Android Nanodegree program. </string>
+    The original version of this app was built by Sascha Jaschke, and a modified version is given to students in the Udacity Android Nanodegree program.
+    A version of the barcode scanner Zbar was used, and so was the Glide image plugin.  The service was changed to async tasks in order to better
+    syncronize events that happen after loading.</string>
 </resources>

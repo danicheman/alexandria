@@ -61,6 +61,14 @@
             android:layout_alignLeft="@+id/eancontainer"
             />
 
+        <ProgressBar
+            android:id="@+id/loadingBook"
+            android:layout_below="@+id/bookSubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -82,6 +90,7 @@
             android:layout_below="@+id/authors"
             android:layout_alignLeft="@+id/eancontainer"
             android:layout_alignStart="@+id/eancontainer"/>
+
 
         <TextView
             android:layout_width="wrap_content"

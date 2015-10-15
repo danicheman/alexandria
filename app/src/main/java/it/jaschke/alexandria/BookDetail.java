@@ -11,6 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,11 +31,18 @@ import it.jaschke.alexandria.services.BookService;
 public class BookDetail extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String EAN_KEY = "EAN";
+    public static final String AUTHORS_KEY = "authors";
+    public static final String CATEGORIES_KEY = "categories";
+    private static final String LOG_TAG = BookDetail.class.getSimpleName();
+
+    private String[] mAuthors;
+    private String[] mCategories;
+
     private final int LOADER_ID = 10;
     private View rootView;
     private String ean;
     private String bookTitle;
-    private ShareActionProvider shareActionProvider;
+    private ShareActionProvider mShareActionProvider;
 
     public BookDetail(){
     }
@@ -43,6 +51,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
 
@@ -70,12 +79,19 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     }
 
 
-    @Override
+    /*@Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.book_detail, menu);
 
         MenuItem menuItem = menu.findItem(R.id.action_share);
-        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+    }*/
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -99,11 +115,12 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
         ((TextView) rootView.findViewById(R.id.fullBookTitle)).setText(bookTitle);
 
+        //mShareActionProvider = (ShareActionProvider) menu.findItem(R.id.action_share);
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + bookTitle);
-        shareActionProvider.setShareIntent(shareIntent);
+        mShareActionProvider.setShareIntent(shareIntent);
 
         String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
         ((TextView) rootView.findViewById(R.id.fullBookSubTitle)).setText(bookSubTitle);
@@ -112,14 +129,14 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        String[] authorsArr;
+        String[] mAuthors;
 
         if (authors == null) {
             authors = "No Authors Found";
-            authorsArr = new String[]{authors};
-        } else authorsArr = authors.split(",");
+            mAuthors = new String[]{authors};
+        } else mAuthors = authors.split(",");
 
-        ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
+        ((TextView) rootView.findViewById(R.id.authors)).setLines(mAuthors.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
@@ -148,5 +165,14 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         if(MainActivity.IS_TABLET && rootView.findViewById(R.id.right_container)==null){
             getActivity().getSupportFragmentManager().popBackStack();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(EAN_KEY, ean);
+        outState.putStringArray(AUTHORS_KEY, mAuthors);
+        outState.putStringArray(CATEGORIES_KEY, mCategories);
+
     }
 }

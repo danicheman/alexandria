@@ -107,6 +107,15 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 bookIntent.putExtra(BookService.EAN, ean);
                 bookIntent.setAction(BookService.FETCH_BOOK);
                 getActivity().startService(bookIntent);*/
+
+                //hide keyboard because we are running a search.
+                // Check if no view has focus:
+                View view = getActivity().getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+
                 GetIsbnResultTask getIsbnResultTask = new GetIsbnResultTask();
                 getIsbnResultTask.execute(ean);
                 //AddBook.this.restartLoader();
@@ -167,6 +176,8 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             eanStr="978"+eanStr;
         }
         Log.d(TAG, "Searching with eanStr: " + eanStr);
+        //starting loading
+        rootView.findViewById(R.id.loadingBook).setVisibility(View.VISIBLE);
         return new CursorLoader(
                 getActivity(),
                 AlexandriaContract.BookEntry.buildFullBookUri(Long.parseLong(eanStr)),
@@ -179,26 +190,21 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+
+        //hide loading animation
+        rootView.findViewById(R.id.loadingBook).setVisibility(View.GONE);
+
         if (!data.moveToFirst()) {
+            String errorMsg = getResources().getString(R.string.book_not_found);
             if (!NetworkUtil.isNetworkAvailable(getActivity())) {
                 Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-                messageIntent.putExtra(MainActivity.MESSAGE_KEY,"Unable to fetch data, you are not connected to the internet.");
+                messageIntent.putExtra(MainActivity.MESSAGE_KEY, "Unable to fetch data, you are not connected to the internet.");
                 LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(messageIntent);
-                Log.e(TAG, "No internet connection. Load finished with No results.");
-            } else {
-                Log.e(TAG, "Network IS connected. Load finished with No results.");
+                errorMsg = getResources().getString(R.string.no_connection);
             }
             //do nothing found toast
-            ((TextView) rootView.findViewById(R.id.bookTitle)).setText("No Book Found.");
+            ((TextView) rootView.findViewById(R.id.bookTitle)).setText(errorMsg);
             return;
-        } else {
-            //hide keyboard
-            // Check if no view has focus:
-            View view = getActivity().getCurrentFocus();
-            if (view != null) {
-                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
-            }
         }
 
         String bookTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.TITLE));
@@ -222,12 +228,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            //new DownloadImage((ImageView) rootView.findViewById(R.id.bookCover)).execute(imgUrl);
             Glide.with(getActivity()).load(imgUrl).into((ImageView) rootView.findViewById(R.id.bookCover));
             rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
         }
 
-        //data.close();
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
 
@@ -259,33 +263,42 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
     }
 
     //todo: add loading animation here in pre-execute, hide in post execute.  Handle error conditions better
-    private class GetIsbnResultTask extends AsyncTask<String, Void, Void> {
+    private class GetIsbnResultTask extends AsyncTask<String, Void, String> {
 
         private final String LOG_TAG = GetIsbnResultTask.class.getSimpleName();
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
             Log.d(LOG_TAG, "on post execute");
-            //now search the database for the provided isbn
-            restartLoader();
+            if (result == getResources().getString(R.string.success)) {
+                restartLoader();
+            } else {
+                rootView.findViewById(R.id.loadingBook).setVisibility(View.GONE);
+            }
+
+            if (!NetworkUtil.isNetworkAvailable(getActivity())) {
+                //overwrite any other error if internet is down.
+                result = getResources().getString(R.string.no_connection);
+            }
+            ((TextView) rootView.findViewById(R.id.bookTitle)).setText(result);
         }
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             if (params == null) return null;
-            fetchBook(params[0]);
-            return null;
+
+            return fetchBook(params[0]);
         }
 
         /**
          * Handle action fetchBook in the provided background thread with the provided
          * parameters.
          */
-        private void fetchBook(String ean) {
+        private String fetchBook(String ean) {
 
             if (ean.length() != 13) {
-                return;
+                return getResources().getString(R.string.invalid_ean);
             }
 
             //check if book has already been fetched
@@ -300,7 +313,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             int bookCount = bookEntry.getCount();
             bookEntry.close();
 
-            if (bookCount > 0) return;
+            if (bookCount > 0) return getResources().getString(R.string.success);
 
 
             HttpURLConnection urlConnection = null;
@@ -326,7 +339,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
-                    return;
+                    return getResources().getString(R.string.no_server_response);
                 }
 
                 reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -337,11 +350,11 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 }
 
                 if (buffer.length() == 0) {
-                    return;
+                    return getResources().getString(R.string.success);
                 }
                 bookJsonString = buffer.toString();
             } catch (UnknownHostException e) {
-                //UnknownHostException if site is unreachable.
+                return getResources().getString(R.string.no_route_to_server);
             } catch (Exception e) {
 
                 Log.e(LOG_TAG, "Error reader" + bookJsonString + e.getClass());
@@ -373,7 +386,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
             try {
                 //network was down?
                 if (bookJsonString == null) {
-                    return;
+                    return getResources().getString(R.string.no_server_response);
                 }
 
                 JSONObject bookJson = new JSONObject(bookJsonString);
@@ -384,7 +397,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     //Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
                     //messageIntent.putExtra(MainActivity.MESSAGE_KEY,getResources().getString(R.string.not_found));
                     //LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
-                    return;
+                    return getResources().getString(R.string.book_not_found);
                 }
 
                 JSONObject bookInfo = ((JSONObject) bookArray.get(0)).getJSONObject(VOLUME_INFO);
@@ -416,12 +429,10 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 }
 
             } catch (JSONException e) {
-                Intent messageIntent = new Intent(MainActivity.MESSAGE_EVENT);
-                messageIntent.putExtra(MainActivity.MESSAGE_KEY, "Unexpected, unusable result from search");
-                //LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(messageIntent);
                 Log.e(LOG_TAG, "Error, here's the web result: " + bookJsonString, e);
-                return;
+                return getResources().getString(R.string.invalid_response);
             }
+            return getResources().getString(R.string.success);
         }
 
         private void writeBackBook(String ean, String title, String subtitle, String desc, String imgUrl) {
