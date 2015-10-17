@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="invalid_ean">The ISBN code provided does not have 13 digits.</string>
+    <string name="no_connection">Internet Connection Unavailable.</string>
+    <string name="no_route_to_server">Internet is connected but could not reach book server.</string>
+    <string name="no_server_response">The search response was empty.</string>
+    <string name="invalid_response">The server did not return recognizable book information.</string>
+    <string name="book_not_found">This book was not found.</string>
+    <string name="database_save_failed">An error occured while trying to save the book on your device.</string>
+    <string name="success">Book found! Loading Details.</string>
+</resources>

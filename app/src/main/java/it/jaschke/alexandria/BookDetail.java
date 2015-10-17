@@ -8,6 +8,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -111,14 +112,14 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         ((TextView) rootView.findViewById(R.id.fullBookDesc)).setText(desc);
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        String[] authorsArr;
+        String[] mAuthors;
 
         if (authors == null) {
             authors = "No Authors Found";
-            authorsArr = new String[]{authors};
-        } else authorsArr = authors.split(",");
+            mAuthors = new String[]{authors};
+        } else mAuthors = authors.split(",");
 
-        ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
+        ((TextView) rootView.findViewById(R.id.authors)).setLines(mAuthors.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
