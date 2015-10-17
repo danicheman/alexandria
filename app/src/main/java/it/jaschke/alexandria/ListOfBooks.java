@@ -158,8 +158,6 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
                     null  // sort order
             );
 
-
-            Log.e(LOG_TAG, "FetchbooksTask all book fetch result:" + mBookCursor.getCount());
             return null;
         }
 

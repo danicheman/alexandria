@@ -98,7 +98,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     return;
                 }
 
-                Log.d(TAG, "Searching with eanStr: " + ean);
+                //Log.d(TAG, "Searching with eanStr: " + ean);
                 //starting loading
                 rootView.findViewById(R.id.loadingBook).setVisibility(View.VISIBLE);
 
@@ -107,7 +107,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                 bookIntent.putExtra(BookService.EAN, ean);
                 bookIntent.setAction(BookService.FETCH_BOOK);
                 getActivity().startService(bookIntent);
-                //AddBook.this.restartLoader();
 
                 //hide keyboard because we are running a search.
                 // Check if no view has focus:
@@ -117,8 +116,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
 
-                //restartloader should be called after completed IntentService
-                //AddBook.this.restartLoader();
             }
         });
 
@@ -229,7 +226,6 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         } else {
             authorsArr = authors.split(",");
         }
-        Log.e(TAG, authors);
 
         ((TextView) rootView.findViewById(R.id.authors)).setLines(authorsArr.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
