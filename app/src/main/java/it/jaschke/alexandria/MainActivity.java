@@ -37,10 +37,18 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     public static final String MESSAGE_EVENT = "MESSAGE_EVENT";
     public static final String MESSAGE_KEY = "MESSAGE_EXTRA";
 
+    public static final String DELETE_BOOK_MESSAGE = "DELETE_BOOK_MESSAGE";
+    public static final String FETCH_BOOK_MESSAGE = "FETCH_BOOK_MESSAGE";
+
+    private static final String LIST_FRAGMENT_TAG = "LIST_FRAGMENT";
+    private static final String ADD_FRAGMENT_TAG = "ADD_FRAGMENT";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         IS_TABLET = isTablet();
+
         if(IS_TABLET){
             setContentView(R.layout.activity_main_tablet);
         }else {
@@ -66,14 +74,17 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment nextFragment;
+        String nextFragmentTag = "";
 
         switch (position){
             default:
             case 0:
                 nextFragment = new ListOfBooks();
+                nextFragmentTag = LIST_FRAGMENT_TAG;
                 break;
             case 1:
                 nextFragment = new AddBook();
+                nextFragmentTag = ADD_FRAGMENT_TAG;
                 break;
             case 2:
                 nextFragment = new About();
@@ -82,7 +93,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         }
 
         fragmentManager.beginTransaction()
-                .replace(R.id.container, nextFragment)
+                .replace(R.id.container, nextFragment, nextFragmentTag)
                 .addToBackStack((String) title)
                 .commit();
     }
@@ -155,8 +166,29 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private class MessageReciever extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getStringExtra(MESSAGE_KEY)!=null){
-                Toast.makeText(MainActivity.this, intent.getStringExtra(MESSAGE_KEY), Toast.LENGTH_LONG).show();
+            //got a book fetch message
+            if(intent.hasExtra(FETCH_BOOK_MESSAGE)){
+
+                //check if the "add book" fragment is active and visible
+                AddBook addFragment = (AddBook)getSupportFragmentManager().findFragmentByTag(ADD_FRAGMENT_TAG);
+                if (addFragment != null && addFragment.isVisible()) {
+                    String fetchBookMessage = intent.getStringExtra(FETCH_BOOK_MESSAGE);
+                    if(fetchBookMessage != getResources().getString(R.string.success)) {
+                        addFragment.displayError(fetchBookMessage);
+                    } else {
+                        addFragment.restartLoader();
+                    }
+                }
+
+            //got a delete book message (delete completed notification)
+            } else if (intent.hasExtra(DELETE_BOOK_MESSAGE)){
+
+                //check if the list of books is an active and visible fragment
+                ListOfBooks listFragment = (ListOfBooks)getSupportFragmentManager().findFragmentByTag(LIST_FRAGMENT_TAG);
+                if (listFragment != null && listFragment.isVisible()) {
+                    //refresh list of books
+                    listFragment.restartLoader();
+                }
             }
         }
     }

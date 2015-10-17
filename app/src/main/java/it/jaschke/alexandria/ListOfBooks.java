@@ -77,7 +77,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
         return rootView;
     }
 
-    private void restartLoader(){
+    public void restartLoader(){
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
@@ -112,7 +112,7 @@ public class ListOfBooks extends Fragment implements LoaderManager.LoaderCallbac
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        if(data.moveToFirst() != false) {
+        if(data.moveToFirst()) {
 
             Log.e(LOG_TAG, "Load finished with one or more results.");
         } else {
