@@ -232,7 +232,7 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
 
-            Glide.with(getActivity()).load(imgUrl).into((ImageView) rootView.findViewById(R.id.bookCover));
+            Glide.with(getActivity()).load(imgUrl).error(R.drawable.no_image).into((ImageView) rootView.findViewById(R.id.bookCover));
             rootView.findViewById(R.id.bookCover).setVisibility(View.VISIBLE);
         }
 

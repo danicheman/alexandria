@@ -122,11 +122,17 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         ((TextView) rootView.findViewById(R.id.authors)).setLines(mAuthors.length);
         ((TextView) rootView.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
+
+        ImageView bookCover = (ImageView) rootView.findViewById(R.id.fullBookCover);
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
-            //new DownloadImage((ImageView) rootView.findViewById(R.id.fullBookCover)).execute(imgUrl);
-            Glide.with(this).load(imgUrl).into((ImageView) rootView.findViewById(R.id.fullBookCover));
-            rootView.findViewById(R.id.fullBookCover).setVisibility(View.VISIBLE);
+            //load url
+            Glide.with(this).load(imgUrl).error(R.drawable.no_image).into(bookCover);
+        } else {
+            //load default image no_image
+            Glide.with(this).load(R.drawable.no_image).into(bookCover);
         }
+
+        bookCover.setVisibility(View.VISIBLE);
 
         String categories = data.getString(data.getColumnIndex(AlexandriaContract.CategoryEntry.CATEGORY));
         ((TextView) rootView.findViewById(R.id.categories)).setText(categories);

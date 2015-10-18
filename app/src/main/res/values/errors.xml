@@ -6,6 +6,8 @@
     <string name="no_server_response">The search response was empty.</string>
     <string name="invalid_response">The server did not return recognizable book information.</string>
     <string name="book_not_found">This book was not found.</string>
-    <string name="database_save_failed">An error occured while trying to save the book on your device.</string>
+    <string name="database_save_failed">An error occurred while trying to save the book on your device.</string>
+    <string name="unexpected_server_exception">Unexpected error receiving server data: </string>
+    <string name="unexepcted_parser_exception">Unexpected exception parsing server response: </string>
     <string name="success">Book found! Loading Details.</string>
 </resources>

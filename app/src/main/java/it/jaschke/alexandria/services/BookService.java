@@ -148,6 +148,7 @@ public class BookService extends IntentService {
 
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error ", e);
+            return getResources().getString(R.string.unexpected_server_exception) + e.getClass();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -212,8 +213,9 @@ public class BookService extends IntentService {
             }
 
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Error, here's the web result: " + bookJsonString, e);
             return getResources().getString(R.string.invalid_response);
+        } catch (Exception e) {
+            return getResources().getString(R.string.unexepcted_parser_exception) + e.getClass();
         }
         return getResources().getString(R.string.success);
     }
