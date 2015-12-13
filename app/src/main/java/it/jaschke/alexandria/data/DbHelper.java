@@ -42,9 +42,9 @@ public class DbHelper extends SQLiteOpenHelper {
                 AlexandriaContract.BookEntry.TABLE_NAME + " (" + AlexandriaContract.BookEntry._ID + "))";
 
 
-        Log.d("sql-statments",SQL_CREATE_BOOK_TABLE);
+        /*Log.d("sql-statments",SQL_CREATE_BOOK_TABLE);
         Log.d("sql-statments",SQL_CREATE_AUTHOR_TABLE);
-        Log.d("sql-statments",SQL_CREATE_CATEGORY_TABLE);
+        Log.d("sql-statments",SQL_CREATE_CATEGORY_TABLE);*/
 
         db.execSQL(SQL_CREATE_BOOK_TABLE);
         db.execSQL(SQL_CREATE_AUTHOR_TABLE);
@@ -54,6 +54,10 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        //Remove old values when upgrading.
+        db.execSQL("DROP TABLE IF EXISTS " + AlexandriaContract.CategoryEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AlexandriaContract.AuthorEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AlexandriaContract.BookEntry.TABLE_NAME);
+        onCreate(db);
     }
 }
